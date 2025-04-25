@@ -14,3 +14,6 @@ export const generateMenuByAuth = false
 export const openRedirectLogin = true
 
 export const imageFormats = ['jpg', 'jpeg', 'png', 'bmp', 'gif', 'bmp', 'tiff', 'webp', 'heif']
+
+// 是否启用多标签页（TagsView）
+export const enableMultiTags = true

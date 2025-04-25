@@ -21,7 +21,7 @@ async function handleSubmitSuccess() {
 <template>
   <!-- 主要内容区 -->
   <div class="w-[100vw] h-[100vh] p-5 flex relative page">
-    <div class="absolute right-20 top-[50%] w-100 shadow p-10 rounded-[10px] bg-white content-wrapper">
+    <div class="absolute right-20 top-[50%] w-100 shadow p-10 rounded-[10px] bg-bg-white content-wrapper">
       <QuickLogin @success="handleSubmitSuccess" />
     </div>
   </div>

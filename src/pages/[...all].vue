@@ -1,14 +1,12 @@
 <script setup lang="ts">
-const { t } = useI18n()
+import NotFound from '@/components/404.vue'
 </script>
 
 <template>
-  <div>
-    {{ t('not-found') }}
-  </div>
+  <NotFound />
 </template>
 
 <route lang="yaml">
-meta:
-  layout: 404
+  meta:
+    title: 404
 </route>

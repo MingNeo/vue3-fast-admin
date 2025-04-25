@@ -13,8 +13,8 @@ const themeColors: Record<string, any> = {
   'bg-active': 'var(--background-active)',
   'active': 'var(--active-color)',
   'text-black': 'var(--text-color)',
-  'grey': 'var(--text-color-grey)',
-  'border-grey': 'var(--text-color-grey)',
+  'gray': 'var(--text-color-gray)',
+  'border-gray': 'var(--text-color-gray)',
 }
 
 export default defineConfig({

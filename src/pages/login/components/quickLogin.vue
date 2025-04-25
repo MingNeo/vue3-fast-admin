@@ -22,7 +22,7 @@ const rules = ref({
 
 const userStore = useUserStore()
 
-const { start, formattedTime, isCounting } = useCountdown(60)
+const { start, formattedTime, isCounting } = useSecondsCountdown(60)
 async function handleGetCaptcha() {
   start()
   try {
@@ -46,7 +46,7 @@ async function handleSubmit(values) {
 </script>
 
 <template>
-  <div class="bg-white">
+  <div class="bg-bg-white">
     <div class="mb-6 text-[30px] text-center">
       登录
     </div>

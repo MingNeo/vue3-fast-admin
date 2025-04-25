@@ -1,5 +1,5 @@
-import { createI18n } from 'vue-i18n'
 import type { UserModule } from '@/types'
+import { createI18n } from 'vue-i18n'
 
 // https://vitejs.dev/guide/features.html#glob-import
 const messages = Object.fromEntries(
@@ -14,10 +14,9 @@ const messages = Object.fromEntries(
 
 export const install: UserModule = ({ app }) => {
   const i18n = createI18n({
-    legacy: false,
     locale: 'zh-CN',
     messages,
+    legacy: false,
   })
-
   app.use(i18n)
 }

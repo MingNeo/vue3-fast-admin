@@ -1,0 +1,39 @@
+user:
+  title: User Management
+  add: Add User
+  edit: Edit User
+  delete: Delete User
+  assignRole: Assign Role
+  username: Username
+  email: Email
+  role: Role
+  actions: Actions
+role:
+  title: Role Management
+  add: Add Role
+  edit: Edit Role
+  delete: Delete Role
+  assignPerm: Assign Permission
+  name: Role Name
+  desc: Description
+  actions: Actions
+menu:
+  title: Menu Management
+  add: Add Menu
+  edit: Edit Menu
+  delete: Delete Menu
+  title_: Menu Name
+  path: Route Path
+  icon: Icon
+  permission: Permission
+log:
+  title: Operation Log
+  user: User
+  action: Action
+  time: Time
+  detail: Log Detail
+common:
+  cancel: Cancel
+  save: Save
+  close: Close
+  search: Search

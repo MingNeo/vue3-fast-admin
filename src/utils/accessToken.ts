@@ -1,7 +1,7 @@
-import cookie from 'js-cookie'
 import { ACCESS_TOKEN_SAVE_KEY, accessTokenSaveBy } from '@/config'
+import cookie from 'js-cookie'
 
-const localAccessTokens = {
+export const localAccessTokens = {
   localStorage: {
     get: (key?: string) => localStorage.getItem(key || ACCESS_TOKEN_SAVE_KEY),
     set: (accessToken: string) => localStorage.setItem(ACCESS_TOKEN_SAVE_KEY, accessToken),

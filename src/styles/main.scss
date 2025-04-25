@@ -2,12 +2,12 @@
   --primary-color: #3356EB;
   --text-color: #000;
   --text-color-white: #fff;
-  --text-color-grey: #eee;
-  --bg-color-grey: #F1F2F4;
+  --text-color-gray: #eee;
+  --bg-color-gray: #F1F2F4;
   --bg-color-white: #fff;
 
   --el-color-primary: var(--primary-color) !important;
-  --el-disabled-bg-color: var(--text-color-grey) !important;
+  --el-disabled-bg-color: var(--text-color-gray) !important;
   --el-checkbox-checked-bg-color: var(--primary-color);
   --el-checkbox-checked-input-border-color: var(--primary-color);
   --active-color: var(--primary-color);
@@ -34,7 +34,9 @@
 html.dark,
 body.dark {
   color-scheme: dark;
-  --primary-color: #f2f2f2;
+  // --text-color: #fff;
+  --bg-color-white: #454545;
+  --el-menu-bg-color: var(--bg-color-white);
 }
 
 html,
@@ -44,6 +46,7 @@ body,
   margin: 0;
   padding: 0;
   background: #f2f2f2;
+  color: var(--text-color);
 }
 
 * {

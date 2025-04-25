@@ -70,7 +70,7 @@ const columns = [
 <template>
   <div>
     <SearchForm :fields="searchFields" :search="search" :default-value="searchData" />
-    <common-table
+    <pro-table
       :columns="columns"
       :data-source="dataSource"
       :loading="loading"

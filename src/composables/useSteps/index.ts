@@ -18,11 +18,17 @@ export default function useSteps(steps: Step[] = [], defaultCurrentSetp: Ref<any
   })
 
   const next = () => {
+    if (currentIndex.value >= steps.length - 1)
+      return
+
     currentIndex.value++
     currentKey.value = stepsMap.value[steps[currentIndex.value]?.value]?.index
   }
 
   const prev = () => {
+    if (currentIndex.value <= 0)
+      return
+
     currentIndex.value--
     currentKey.value = stepsMap.value[steps[currentIndex.value]?.value]?.index
   }

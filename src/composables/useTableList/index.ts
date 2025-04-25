@@ -1,136 +1,163 @@
-import { computed } from 'vue'
 import type { Ref } from 'vue'
 import { debounce } from 'lodash-es'
-import useRequest from '../useRequest'
+import { computed, isRef, nextTick, onMounted, ref } from 'vue'
+import { useRequest } from '../useRequest'
 
-export type UseTableListService = (...args: any) => Promise<any>
-export interface UseTableListOptions {
+export type UseTableListService = (params: Record<string, any>) => Promise<{ data: any, total?: number } | any[]>
+
+export interface TableListItemData {
+  [key: string]: any
+}
+export interface UseTableListOptions<T extends TableListItemData> {
   form?: Ref<any>
   defaultSearchData?: Record<string, any>
   defaultPageSize?: number
   immediate?: boolean
   debounceTime?: number
   getTotal?: (data: any) => number
-  getList?: (data: any) => ListItemData[]
+  getData?: (data: any) => T[]
   onReset?: () => any
-  onSearchDataChange?: (value: any) => void
+  onSearchDataChange?: (value: any, page: any) => void
+  mergeData?: boolean
+  refetchOnReset?: boolean
 }
 
-export interface ListItemData {
-  [key: string]: any
-}
-
-const _dataHandlers = {
-  getTotal: (data: any) => data?.value?.total || 0,
-  getList: (data: any) => data?.value?.data || [],
-}
-
-export default function useTableList(
+export function useTableList<T extends TableListItemData>(
   service: UseTableListService,
   {
     form,
     immediate = true,
     defaultPageSize = 10,
     defaultSearchData = {},
-    getTotal = _dataHandlers.getTotal,
-    getList = _dataHandlers.getList,
+    getTotal = (data: any) => Array.isArray(data) ? data.length : data?.total || 0,
+    getData = (data: any) => Array.isArray(data) ? data : data?.data || [],
     onReset = () => undefined,
-    onSearchDataChange = (_value: any) => {},
+    onSearchDataChange = (_value: any, _page: any) => { },
     debounceTime = 100,
-  }: UseTableListOptions = {},
+    mergeData = false,
+    refetchOnReset = true,
+  }: UseTableListOptions<T> = {},
 ) {
   const formRef = isRef(form) ? form : ref()
+
+  const pageNo = ref(defaultSearchData.pageNo || 1)
+  const pageSize = ref(+(defaultSearchData.pageSize || defaultPageSize))
 
   // searchState用于存储搜索表单实时的数据
   const searchState = ref<Record<string, any>>({})
   // searchState用于存储请求所用的数据，仅触发搜索按钮或重置时会更新
-  const searchData = ref<Record<string, any>>({ ...defaultSearchData, pageNo: defaultSearchData.pageNo || 1, pageSize: +(defaultSearchData.pageSize || defaultPageSize) })
+  const searchData = ref<Record<string, any>>({ ...defaultSearchData })
 
   const updateSearchData = (value: Record<string, any>, merge = false) => {
     searchData.value = merge ? { ...searchData.value, ...value } : value
-    onSearchDataChange?.(searchData.value)
+    onSearchDataChange?.(searchData.value, { pageNo: pageNo.value, pageSize: pageSize.value })
   }
 
   const { data, isLoading, execute } = useRequest(service, { immediate: false })
 
-  const total = computed(() => getTotal(data))
-  const list = computed<ListItemData[]>(() => getList(data))
+  const total = computed(() => getTotal(data?.value))
+  const listData: Ref<T[]> = computed(() => {
+    const newData = getData(data?.value) as T[]
+    return mergeData ? [...listData.value, ...newData] : newData
+  })
 
-  const baseFetchData = (params?: Record<string, any>) => {
-    return execute(params ?? { ...searchData.value })
-  }
-
-  const fetchDataSimple = async (params: Record<string, any> = {}, page = {}, merge = true) => {
-    updateSearchData({ ...params, ...page }, merge)
+  const fetchDataSimple = async (params: Record<string, any> = {}, merge = true) => {
+    updateSearchData({ ...searchState.value, ...params }, merge)
     await nextTick()
-    baseFetchData()
+    execute({ ...searchData.value, pageNo: pageNo.value, pageSize: pageSize.value, ...params })
   }
 
-  // 定义搜索函数
-  const fetchData = debounce(fetchDataSimple, debounceTime, { leading: true, trailing: false })
+  const fetchDataDebounce = debounce(fetchDataSimple, debounceTime, { leading: true, trailing: false })
+  const fetchData = (params: Record<string, any> = {}, { mergeParams = true, debounce = true } = {}) => debounce ? fetchDataDebounce(params, mergeParams) : fetchDataSimple(params, mergeParams)
 
-  function bindFormState() {
+  function bindFormData() {
     // 初始化时将搜索数据绑定到表单组件
     if (formRef) {
       Object.keys(searchData.value).forEach((key) => {
         try {
-          if (!['pageNo', 'pageSize'].includes(key))
-            formRef.value[key] = searchData.value[key]
+          formRef.value[key] = searchData.value[key]
         }
         catch (error) {
+          // eslint-disable-next-line no-console
+          console.log(error)
         }
       })
     }
   }
 
-  bindFormState()
+  bindFormData()
+
+  const onSortChange = ({ column, prop, order }: any) => {
+    pageNo.value = 1
+    fetchData({ prop, sortBy: prop, order, column })
+  }
+
+  const reset = () => {
+    const params = onReset?.() || {}
+    if (formRef?.value?.resetFields)
+      formRef?.value?.resetFields?.()
+    else
+      searchState.value = { ...params }
+    pageNo.value = 1
+    pageSize.value = +searchData.value.pageSize
+    updateSearchData({ ...params })
+    if (refetchOnReset)
+      fetchData(searchData.value)
+  }
+
+  const loadNextPage = () => {
+    if (isLoading.value)
+      return
+    pageNo.value += 1
+    fetchData()
+  }
+
+  const changePageSize = (size: number) => {
+    pageSize.value = size
+    pageNo.value = 1
+    fetchData()
+  }
+
+  const changePageNo = (page: number) => {
+    pageNo.value = page
+    return fetchData()
+  }
 
   onMounted(() => {
     if (immediate)
       fetchData()
   })
 
-  const pagination = computed(() => ({
-    current: searchData.value.pageNo,
-    pageSize: Number(searchData.value.pageSize),
-    total: total.value,
-    onChange: (newPageNo: any, newPageSize: any) => fetchData({}, { pageNo: newPageNo, pageSize: newPageSize }),
-    showSizeChanger: true,
-    showQuickJumper: true,
-    showTotal: (total: number, range: number[]) => `${range[0]} - ${range[1]} 条 共 ${total} 条`,
-  }))
-
-  const onSortChange = ({ column, prop, order }: any) => {
-    fetchData({ sortBy: prop, order, column }, { pageNo: 1 })
-  }
-
-  // 如果操作失败后无需返回值、无需别的处理，可以使用此方法包裹简化处理
-  const wrapperAction = (service: (...args: any[]) => any) => async (...args: any[]) => {
-    await service(...args)
-    baseFetchData()
-  }
-
   return {
     searchFormRef: formRef,
-    dataSource: list,
+    data: listData,
     searchState,
     searchData,
     loading: isLoading,
-    pagination,
     fetchData, // 默认请求方法使用debounce处理
-    fetchDataSimple, // 不进行debounce处理
+    loadNextPage,
     onSortChange,
-    wrapperAction,
+
+    currentPage: pageNo,
+    pageSize,
+    total,
+    changePageSize,
+    changePageNo,
+    pagination: computed(() => ({
+      currentPage: pageNo.value,
+      pageSize: pageSize.value,
+      total: total.value,
+      onPageSize: changePageSize,
+      onCurrentPage: changePageNo,
+    })),
+
+    reset,
     search: {
-      submit: (params: any = {}) => {
-        return fetchData(params, { pageNo: 1 })
+      onSubmit: (params: any = {}) => {
+        pageNo.value = 1
+        return fetchData(params)
       },
-      reset: () => {
-        formRef?.value?.resetFields?.()
-        const params = onReset?.()
-        updateSearchData({ pageSize: +searchData.value.pageSize, pageNo: 1, ...params })
-        fetchData(searchData.value)
-      },
+      onReset: reset,
     },
   }
 }

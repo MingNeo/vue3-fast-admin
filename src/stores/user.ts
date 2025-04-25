@@ -1,8 +1,8 @@
-import { acceptHMRUpdate, defineStore } from 'pinia'
-import { debounce } from 'lodash-es'
 import * as api from '@/api/user'
 import { saveLoginToken } from '@/config'
 import localAccessToken from '@/utils/accessToken'
+import { debounce } from 'lodash-es'
+import { acceptHMRUpdate, defineStore } from 'pinia'
 
 export const useUserStore = defineStore('user', () => {
   const token = ref(localAccessToken.get())

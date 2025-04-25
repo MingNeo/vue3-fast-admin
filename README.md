@@ -1,21 +1,21 @@
-# Vue3 基础工程
-本工程在通用基础工程基础上，内置了常用功能及基础组件，方便快速开发应用。
+# vue3-fast-admin
+
+> 一个专注于中后台页面与表单快速搭建的 Vue3 工程化模板，内置丰富的渐进式高扩展性组件，助力极速及优雅的开发。
 
 ## 特性
 
-- ⚡️ [Vue 3](https://github.com/vuejs/core), [Vite](https://github.com/vitejs/vite), [pnpm](https://pnpm.io/), [esbuild](https://github.com/evanw/esbuild)
-- 🗂 [基于文件的路由](./src/pages)
-- 📦 [组件自动化加载](./src/components)
-- 🍍 [使用 Pinia 的状态管理](https://pinia.vuejs.org)
-- 📑 [布局系统](./src/layouts)
-- 🎨 [UnoCSS](https://github.com/unocss/unocss) - 高性能且极具灵活性的即时原子化 CSS 引擎
-- 🌍 [I18n 国际化](./locales)
-- 📥 [API 自动加载](https://github.com/antfu/unplugin-auto-import) - Composition 等API 自动引入
-- 🖨 使用 [vite-ssg](https://github.com/antfu/vite-ssg) 进行服务端生成 (SSG), 需手工开启
-- ⚙️ 使用 [Vitest](https://github.com/vitest-dev/vitest) 进行单元测试, [Cypress](https://cypress.io/) 进行 E2E 测试
-- ⚙️ 使用 [Storybook](https://storybook.js.org/) 进行可视化调试与预览
-
-<br>
+- ⚡️ Vue3 + Vite + Pinia + UnoCSS
+- 🗂 文件路由自动生成
+- 📦 组件自动加载
+- 🏗️ 页面/表单快速搭建组件（详见下方“核心组件”）
+- 🌍 国际化支持
+- 📑 布局系统
+-  I18n 国际化
+- 📥 API 自动加载、自动Mock
+- 🖨 vite-ssg 服务端生成 (SSG)
+- ⚙️ Vitest 单元测试, Cypress E2E 测试
+- 🧩 Storybook 组件预览
+- 🏗️ **内置页面/表单快速搭建核心组件**（见下方"核心组件"）
 
 ## 使用
 ### 开发
@@ -41,6 +41,115 @@ pnpm build
 ```
 
 然后你会看到用于发布的 `dist` 文件夹被生成。
+
+---
+
+## 核心组件
+使用 [Pro-el-components](https://mingneo.github.io/pro-el-components/)
+### 1. ProFormFields
+- **简介**：通过配置字段数组，自动生成表单块（而非表单），支持多类型、联动、校验、多个表单块及原生组件/dom 自由组合。
+- **高级特性**：支持自定义组件、数组表单、字段联动、校验、布局灵活。
+- **用法示例**：
+
+```vue
+<script setup>
+const data = ref({ name: '', gender: '' })
+const fields = ref([
+  { label: '姓名', prop: 'name', type: 'input', required: true },
+  { label: '性别', prop: 'gender', type: 'select', fieldProps: { options: [{ label: '男', value: 'male' }, { label: '女', value: 'female' }] } }
+])
+const fields2 = ref([
+  { label: '年龄', prop: 'age', type: 'input', required: true }
+])
+</script>
+
+<template>
+  <el-form :model="data">
+    <ProFormFields v-model="data" :column="3" :fields="fields" />
+    <p>
+      中间可以混合任何其他组件或 html
+    </p>
+    <ProFormFields v-model="data2" :column="3" :fields="fields2" />
+  </el-form>
+</template>
+```
+
+### 2. [SearchForm 筛选项](https://mingneo.github.io/pro-el-components/components/SearchForm.html)
+- **简介**：基于ProFormFields，通过配置字段，快速生成统一风格的查询表单，常用于列表页顶部。
+- **用法示例**：
+
+```vue
+<script setup>
+const fields = [
+  { label: '用户名', prop: 'username', type: 'input' },
+  { label: '性别', prop: 'gender', type: 'select', fieldProps: { options: [{ label: '男', value: 'male' }, { label: '女', value: 'female' }] } }
+]
+</script>
+
+<template>
+  <SearchForm :fields="fields" />
+</template>
+```
+
+### 3. [ListPage ListPage（列表页）](https://mingneo.github.io/pro-el-components/components/ListPage.html)
+- **简介**： 基于ProFormFields及Table，通过配置字段，快速生成统一风格的列表页，常用于列表页顶部。
+- **用法示例**：
+
+```vue
+<script setup>
+const formData = ref([{ name: '', gender: '' }])
+const columns = [
+  { label: '姓名', prop: 'name', type: 'input', required: true },
+  { label: '性别', prop: 'gender', type: 'select', options: [{ label: '男', value: 'male' }, { label: '女', value: 'female' }] }
+]
+</script>
+
+<template>
+  <TableForm v-model="formData" :columns="columns" />
+</template>
+```
+
+### 4. ModalForm（弹窗表单）
+- **简介**：通过配置字段，快速生成弹窗表单，支持详情/编辑/新建等多种模式。
+- **用法示例**：
+
+```vue
+<script setup>
+const visible = ref(false)
+const fields = [
+  { prop: 'name', label: '姓名', required: true },
+  { prop: 'age', label: '年龄', type: 'number' },
+  { prop: 'address', label: '地址', type: 'textarea' }
+]
+const formData = reactive({ name: '', age: '', address: '' })
+function handleSubmit(value) {
+  console.log(value)
+}
+</script>
+
+<template>
+  <common-modal-form v-model="visible" :fields="fields" :default-value="formData" @ok="handleSubmit" />
+</template>
+```
+
+### 5. [DetailPage 详情/编辑/新建页快速生成](https://mingneo.github.io/pro-el-components/components/DetailPage.html)
+- **简介**：通过配置字段，快速生成详情、编辑、新建等多种状态的页面。
+- **用法示例**：
+
+```vue
+<script setup>
+const data = ref({})
+const viewMode = ref(false)
+const fields = [
+  { label: '编码', prop: 'code', required: true },
+  { label: '名称', prop: 'name' }
+]
+</script>
+
+<template>
+  <common-page-detail :fields="fields" :default-value="data" :view-mode="viewMode" />
+</template>
+```
 
 ### 路径别名
 
@@ -116,11 +225,6 @@ hasAuth('demoList:del')
 如使用自定义图标，可在src/assets/iconify.json中配置。
 如上传至iconfont，并配合(tampermonkey-iconfont-iconify油猴插件)[https://github.com/yee94/tampermonkey-iconfont-iconify]插件直接下载iconify.json文件覆盖即可。
 
-```vue
 ### mock
 
 mock目录下的文件将自动生成mock，当本地开发且未转发时可自动使用mock
-
-### 组件预览
-
-内置Storybook，

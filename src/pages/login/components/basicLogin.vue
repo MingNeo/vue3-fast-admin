@@ -35,7 +35,7 @@ async function handleSubmit(values) {
 </script>
 
 <template>
-  <div class="bg-white">
+  <div class="bg-bg-white">
     <div class="mb-5 text-[30px] text-center">
       登录
     </div>

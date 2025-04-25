@@ -1,8 +1,8 @@
 import type { CreateAxiosDefaults, InternalAxiosRequestConfig } from 'axios'
+import { REQUEST_ACCESS_TOKEN_KEY, saveLoginToken } from '@/config'
 import axios from 'axios'
 import { isObject } from 'lodash-es'
 import localAccessToken from './accessToken'
-import { REQUEST_ACCESS_TOKEN_KEY, saveLoginToken } from '@/config'
 
 interface RequestConfig extends InternalAxiosRequestConfig {
   formatData?: boolean

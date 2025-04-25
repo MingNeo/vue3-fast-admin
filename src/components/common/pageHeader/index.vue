@@ -9,7 +9,7 @@ defineProps<{
 
 const emit = defineEmits(['cancel', 'update:tabActiveKey'])
 
-const query = useQuery()
+const query = useUrlData()
 
 function handleCancel() {
   emit('cancel')
@@ -24,9 +24,9 @@ function handleUpdateTabActiveKey(...args: any) {
 </script>
 
 <template>
-  <div class="header t-page-header" v-bind="$attrs">
-    <div class="title">
-      <Icon v-if="showBack" icon="icon-park-outline:left" class="back-icon" @click="handleCancel" />
+  <div class="header t-page-header relative z-20 h-[60px] flex justify-between items-center bg-bg-white px-6 py-3 shadow-[0_2px_6px_-5px_rgba(0,0,0,0.04),0_2px_6px_rgba(0,0,0,0.06)]" v-bind="$attrs">
+    <div class="title flex items-center">
+      <Icon v-if="showBack" icon="icon-park-outline:left" class="back-icon mr-2 cursor-pointer" @click="handleCancel" />
       <slot name="title">
         <div v-if="title" class="mr-[10px]">
           {{ title }}
@@ -45,45 +45,3 @@ function handleUpdateTabActiveKey(...args: any) {
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.header {
-  position: relative;
-  z-index: 2;
-  height: 60px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #fff;
-  padding: 14px 24px;
-  box-shadow: 0px 2px 6px -5px rgba(0, 0, 0, 0.04), 0px 2px 6px rgba(0, 0, 0, 0.06);
-
-  .title {
-    display: flex;
-    align-items: center;
-  }
-
-  .back-icon {
-    margin-right: 8px;
-    cursor: pointer;
-  }
-}
-</style>
-
-<style lang="scss">
-.t-page-header {
-  .ant-tabs-top > .ant-tabs-nav::before,
-  .ant-tabs-bottom > .ant-tabs-nav::before,
-  .ant-tabs-top > div > .ant-tabs-nav::before,
-  .ant-tabs-bottom > div > .ant-tabs-nav::before {
-    display: none
-  }
-
-  .ant-tabs-top > .ant-tabs-nav,
-  .ant-tabs-bottom > .ant-tabs-nav,
-  .ant-tabs-top > div > .ant-tabs-nav,
-  .ant-tabs-bottom > div > .ant-tabs-nav {
-    margin: 0;
-  }
-}
-</style>

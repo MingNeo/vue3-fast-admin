@@ -49,8 +49,7 @@ export function wrapperPageSuccess<T = any>({
   pageSize?: number
   list: T[]
   total?: number
-},
-) {
+}) {
   const pageData = pagination(page, pageSize, list)
 
   return {

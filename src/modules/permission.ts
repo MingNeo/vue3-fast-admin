@@ -1,9 +1,9 @@
 import type { UserModule } from '@/types'
+import { DISABLED_PERMISSSION, enableMultiTags, openRedirectLogin, saveLoginToken } from '@/config'
 import { whiteList } from '@/config/permission'
 import { usePermissionStore } from '@/stores/permission'
 import { useUserStore } from '@/stores/user'
-import { DISABLED_PERMISSSION, openRedirectLogin, saveLoginToken } from '@/config'
-import localAccessToken from '@/utils/accessToken'
+import { localAccessTokens } from '@/utils/accessToken'
 
 declare module 'vue' {
   interface ComponentCustomProperties {
@@ -25,7 +25,7 @@ export const install: UserModule = ({ isClient, router, app }) => {
     const permissionStore = usePermissionStore()
     const userStore = useUserStore()
 
-    const token = saveLoginToken ? userStore.token : localAccessToken.get()
+    const token = saveLoginToken ? userStore.token : localAccessTokens.cookie.get()
     let isLogin = !!token
 
     // 如果用户信息未加载，则获取用户信息
@@ -37,6 +37,15 @@ export const install: UserModule = ({ isClient, router, app }) => {
         if (error?.response?.status === 401)
           isLogin = false
       }
+    }
+
+    const tagsViewStore = useTagsViewStore()
+    // 添加标签页
+    if (enableMultiTags && to.name && to.path !== '/') {
+      // 延迟添加标签页，确保在路由跳转完成后执行
+      Promise.resolve().then(() => {
+        tagsViewStore.addView(to)
+      })
     }
 
     // 检查用户是否具有所需的权限

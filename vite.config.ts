@@ -1,16 +1,18 @@
+import type { ComponentResolver } from 'unplugin-vue-components/types'
 import path from 'node:path'
-import { defineConfig } from 'vite'
+import VueI18n from '@intlify/unplugin-vue-i18n/vite'
+import { unheadVueComposablesImports } from '@unhead/vue'
 import Vue from '@vitejs/plugin-vue'
+import { ProElComponentsResolver } from 'pro-el-components/resolver'
+import Unocss from 'unocss/vite'
+import AutoImport from 'unplugin-auto-import/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import Components from 'unplugin-vue-components/vite'
 import VueRouter from 'unplugin-vue-router/vite'
+import { defineConfig } from 'vite'
+import { viteMockServe } from 'vite-plugin-mock'
 // import generateSitemap from 'vite-ssg-sitemap'
 import Layouts from 'vite-plugin-vue-layouts'
-import Components from 'unplugin-vue-components/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import type { ComponentResolver } from 'unplugin-vue-components/types'
-import AutoImport from 'unplugin-auto-import/vite'
-import VueI18n from '@intlify/unplugin-vue-i18n/vite'
-import { viteMockServe } from 'vite-plugin-mock'
-import Unocss from 'unocss/vite'
 import devServerConfig from './dev.server.config'
 
 function IconParkResolver(): ComponentResolver {
@@ -48,16 +50,19 @@ export default defineConfig(({ command }) => ({
     }),
 
     // https://github.com/JohnCampionJr/vite-plugin-vue-layouts
-    Layouts({ defaultLayout: 'basic' }),
+    Layouts({ defaultLayout: 'default' }),
 
     // https://github.com/antfu/unplugin-auto-import
     AutoImport({
-      resolvers: [ElementPlusResolver()],
+      resolvers: [
+        ElementPlusResolver(),
+        ProElComponentsResolver(),
+      ],
       imports: [
         'vue',
         'vue-router',
         'vue-i18n',
-        '@vueuse/head',
+        unheadVueComposablesImports,
         '@vueuse/core',
       ],
       dts: 'src/auto-imports.d.ts',
@@ -71,7 +76,13 @@ export default defineConfig(({ command }) => ({
 
     // https://github.com/antfu/unplugin-vue-components
     Components({
-      resolvers: [ElementPlusResolver(), IconParkResolver()],
+      resolvers: [
+        ElementPlusResolver({
+          importStyle: 'css',
+        }),
+        ProElComponentsResolver(),
+        IconParkResolver(),
+      ],
       extensions: ['vue'],
       include: [/\.vue$/, /\.vue\?vue/],
       directoryAsNamespace: true,
@@ -103,13 +114,20 @@ export default defineConfig(({ command }) => ({
   test: {
     include: ['test/**/*.test.ts', 'src/**/test/**/*.test.ts'],
     environment: 'jsdom',
+    css: false,
+    exclude: ['**/*.css'],
     deps: {
-      inline: ['@vue', '@vueuse', 'vue-demi'],
+      inline: ['@vue', '@vueuse', 'vue-demi', /element-plus/],
     },
   },
 
   // css: {
-  //   preprocessorOptions: {},
+  //   preprocessorOptions: {
+  //     scss: {
+  //       api: 'modern-compiler',
+  //       importers: [],
+  //     },
+  //   },
   // },
 
   // vite-ssg如需使用可手工开启

@@ -11,7 +11,7 @@ export const install: UserModule = ({ isClient, router }) => {
     else
       document.title = ''
 
-    const { setselectedKeyByRoute } = useSideMenuStore()
+    const { setselectedKeyByRoute } = useMenuStore()
 
     setselectedKeyByRoute(to)
 

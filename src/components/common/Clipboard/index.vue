@@ -13,8 +13,20 @@ function handleClick() {
 </script>
 
 <template>
-  <div class="t-clipboard inline-block cursor-pointer group relative px-4" @click.stop="handleClick">
+  <div class="pro-clipboard" @click.stop="handleClick">
     <slot>{{ text }}</slot>
-    <Icon icon="mdi:content-copy" class="t-icon-copy absolute top-0 right-0 hidden group-hover:block" />
+    <!-- <div class="pro-clipboard__icon hidden absolute top-2 right-2 cursor-pointer group-hover:block text-[16px]">
+      <slot name="icon">
+        <el-icon class="ml-1 cursor-pointer">
+          <Document />
+        </el-icon>
+      </slot>
+    </div> -->
   </div>
 </template>
+
+<style lang="scss" scoped>
+  .pro-clipboard {
+    @apply inline-block group cursor-pointer relative px-4;
+  }
+</style>

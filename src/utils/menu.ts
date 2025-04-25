@@ -1,7 +1,7 @@
-import { pathToRegexp } from 'path-to-regexp'
-import { routes } from 'vue-router/auto-routes'
 import type { IconifyIcon } from '@iconify/vue'
 import { generateMenuByAuth } from '@/config'
+import { pathToRegexp } from 'path-to-regexp'
+import { routes } from 'vue-router/auto-routes'
 
 export interface MenuItem {
   key: string
@@ -40,4 +40,24 @@ export function generateShowMenu(menus: MenuItem[], hasAuth: (meta: any) => bool
     }
   })
   return showMenu
+}
+
+/**
+ * 递归查找菜单路径
+ * @param menus 菜单数组
+ * @param path 当前路径
+ * @returns 菜单项数组（从根到当前）
+ */
+export function findMenuPathByPath(menus: MenuItem[], path: string): MenuItem[] {
+  for (const menu of menus) {
+    if (menu.path === path)
+      return [menu]
+
+    if (menu.children) {
+      const childPath = findMenuPathByPath(menu.children, path)
+      if (childPath.length)
+        return [menu, ...childPath]
+    }
+  }
+  return []
 }

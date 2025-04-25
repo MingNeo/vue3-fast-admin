@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useHead } from '@vueuse/head'
+import { useHead } from '@unhead/vue'
 import dayjs from 'dayjs'
-import 'dayjs/locale/zh-cn'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { getInfo } from './api/user'
+import 'dayjs/locale/zh-cn'
 
 dayjs.locale('zh-cn')
 
